@@ -30,7 +30,11 @@ public class Todo extends Timestamped {
     @OneToMany(mappedBy = "todo", cascade = CascadeType.REMOVE)
     private List<Comment> comments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "todo")
+    // [수정] CascadeType.REMOVE -> CascadeType.ALL로 변경
+    // 기존: cascade 설정이 없어서 Todo 저장 시 Manager가 DB에 자동 저장되지 않음
+    // 변경: CascadeType.PERSIST가 포함된 ALL을 사용하여
+    //       Todo가 저장될 때 managers 리스트의 Manager도 함께 자동 저장되도록 함
+    @OneToMany(mappedBy = "todo", cascade = CascadeType.ALL)
     private List<Manager> managers = new ArrayList<>();
 
     public Todo(String title, String contents, String weather, User user) {
@@ -38,6 +42,8 @@ public class Todo extends Timestamped {
         this.contents = contents;
         this.weather = weather;
         this.user = user;
+        // Todo 생성 시 생성자를 담당자로 자동 등록
+
         this.managers.add(new Manager(user, this));
     }
 }
